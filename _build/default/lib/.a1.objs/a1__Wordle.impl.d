@@ -1,1 +1,1 @@
-lib/wordle.ml: BatFile BatList List Random
+lib/wordle.ml: BatFile BatList List Random String
