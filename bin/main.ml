@@ -37,11 +37,11 @@ let rec enter_guess secret () =
       (String.lowercase_ascii secret)
       (String.lowercase_ascii user_guess)
   then (
-    let str = evaluate_yellow user_guess secret in
+    let str = evaluate_colors user_guess secret in
     print_endline (letter_to_string str);
     true)
   else if check_word_validity user_guess then (
-    let str = evaluate_yellow user_guess secret in
+    let str = evaluate_colors user_guess secret in
     print_endline (letter_to_string str);
     false)
   else (
