@@ -22,19 +22,61 @@ type letter =
   | Yellow
   | Green
 
-let letter_count = []
+let rec count_of_letter c counts =
+  match counts with
+  | [] -> 0
+  | (k, v) :: t -> if c = k then v else count_of_letter c t
 
-let evaluate guess secret =
-  let rec check index lst =
-    if index == 5 then List.rev lst
-    else if guess.[index] = secret.[index] then
-      check (index + 1) (Green :: lst)
-    else check (index + 1) (White :: lst)
-  in
-  check 0 []
+let rec increment_count c counts =
+  match counts with
+  | [] -> [ (c, 1) ]
+  | (k, v) :: t ->
+      if k = c then (k, v + 1) :: t else (k, v) :: increment_count c t
 
-  let rec letter_to_string = function
+let rec decrement_count c counts =
+  match counts with
+  | [] -> []
+  | (k, v) :: t ->
+      if k = c then if v > 1 then (k, v - 1) :: t else t
+      else (k, v) :: decrement_count c t
+
+let rec evaluate_green guess secret index lst =
+  (* TODO come back to list reversal here *)
+  if index = String.length guess then List.rev lst
+  else if guess.[index] = secret.[index] then
+    evaluate_green guess secret (index + 1) (Green :: lst)
+  else evaluate_green guess secret (index + 1) (White :: lst)
+
+let rec find_count secret index colors counts =
+  match colors with
+  | [] -> counts
+  | h :: t ->
+      if h = Green then find_count secret (index + 1) t counts
+      else
+        find_count secret (index + 1) t (increment_count secret.[index] counts)
+
+let rec find_yellow guess index colors counts acc =
+  match colors with
+  (* Look into reverse function *)
+  | [] -> List.rev acc
+  | h :: t -> (
+      match h with
+      | Green -> find_yellow guess (index + 1) t counts (Green :: acc)
+      | White ->
+          if count_of_letter guess.[index] counts > 0 then
+            let counts1 = decrement_count guess.[index] counts in
+            find_yellow guess (index + 1) t counts1 (Yellow :: acc)
+          else find_yellow guess (index + 1) t counts (White :: acc)
+      | Yellow -> find_yellow guess (index + 1) t counts (Yellow :: acc))
+
+let evaluate_yellow guess secret =
+  let colors = evaluate_green guess secret 0 [] in
+  let counts = find_count secret 0 colors [] in
+  find_yellow guess 0 colors counts []
+
+(* TODO Swap out for colored text *)
+let rec letter_to_string = function
   | [] -> ""
   | Green :: t -> "🟩" ^ letter_to_string t
   | Yellow :: t -> "🟨" ^ letter_to_string t
-  | White  :: t -> "⬛" ^ letter_to_string t
+  | White :: t -> "⬛" ^ letter_to_string t
