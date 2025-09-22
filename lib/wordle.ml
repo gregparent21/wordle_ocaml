@@ -6,27 +6,35 @@ type state = {
   dictionary : string list;
 }
 
-let word_lst = BatList.of_enum (BatFile.lines_of "data/La.txt")
+(**[word_lst la_txt] is the String list of words in the dictionary file with
+   path [la_txt] *)
+let word_lst la_txt = BatList.of_enum (BatFile.lines_of la_txt)
 
-let accepted_word_lst =
-  word_lst @ BatList.of_enum (BatFile.lines_of "data/Ta.txt")
+(**[accepted_word_lst la_txt ta_txt] is the String list of accepted guesses.
+   Formed from the String list of words from [la_txt] file path appended to the
+   String list of words in [ta_txt] file path*)
+let accepted_word_lst la_txt ta_txt =
+  word_lst la_txt @ BatList.of_enum (BatFile.lines_of ta_txt)
 
 let () = Random.self_init ()
 
 (** [init] returns a new game by choosing a random secret from the selected
     dictionary. The new game has fields [secret_word], and [dictionary], which
     are said random secret from said dictionary, respectively *)
-let init () =
-  let secret = List.nth word_lst (Random.int (List.length word_lst)) in
-  { secret_word = secret; dictionary = word_lst }
+let init la_txt () =
+  let la_words = word_lst la_txt in
+  let secret = List.nth la_words (Random.int (List.length la_words)) in
+  { secret_word = secret; dictionary = la_words }
 
-(**[check_word guess secret] is true if [guess] is equal to [secret]. False
-   otherwise*)
-let check_word guess secret = guess = secret
+(* (**[check_word guess secret] is true if [guess] is equal to [secret],
+   ignoring differences in upper/lower case. False *) otherwise*)
+let check_word guess secret =
+  String.lowercase_ascii guess = String.lowercase_ascii secret
 
-(**[check_word_validity guess] is true if [guess] is in [accepted_words_lst].
-   Returns false otherwise *)
-let check_word_validity guess = List.mem guess accepted_word_lst
+(**[check_word_validity guess] is true if [guess] is in [accepted_words_lst],
+   ignoring differences in case. Returns false otherwise *)
+let check_word_validity guess la_txt ta_txt =
+  List.mem (String.lowercase_ascii guess) (accepted_word_lst la_txt ta_txt)
 
 (** The [letter] variant assigns a Constant to each position/letter in a guess:
     - [Green] = correct letter in the correct position
@@ -113,10 +121,3 @@ let evaluate_colors guess secret =
   let colors = evaluate_green guess secret 0 [] in
   let counts = find_count secret 0 colors [] in
   find_yellow guess 0 colors counts []
-
-(* TODO Swap out for colored text *)
-let rec letter_to_string = function
-  | [] -> ""
-  | Green :: t -> "🟩" ^ letter_to_string t
-  | Yellow :: t -> "🟨" ^ letter_to_string t
-  | White :: t -> "⬛" ^ letter_to_string t
