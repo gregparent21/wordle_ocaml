@@ -78,7 +78,6 @@ let rec decrement_count c counts =
    of type letter to [acc]*)
 
 let rec evaluate_green guess secret index acc =
-  (* TODO come back to list reversal here *)
   if index = String.length guess then List.rev acc
   else if guess.[index] = secret.[index] then
     evaluate_green guess secret (index + 1) (Green :: acc)
@@ -102,7 +101,6 @@ let rec find_count secret index colors acc =
    the accumulator of updated colors*)
 let rec find_yellow guess index colors counts acc =
   match colors with
-  (* Look into reverse function *)
   | [] -> List.rev acc
   | h :: t -> (
       match h with

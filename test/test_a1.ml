@@ -11,7 +11,9 @@ let tests =
            in
            assert_bool "Checking secret is in dictionary"
              (List.mem s.secret_word expected_dictionary);
-           assert_equal expected_dictionary s.dictionary );
+           assert_bool
+             "Checking expected dictionary equals the correct dictionary"
+             (expected_dictionary = s.dictionary) );
          (*The following are tests regarding accepting/not accepting words *)
          ( "Word in Ta.txt is accepted as a guess" >:: fun _ ->
            let word = "ulans" in

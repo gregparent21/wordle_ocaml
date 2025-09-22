@@ -62,11 +62,7 @@ let rec print_colored_guess guess colors index =
 let rec enter_guess secret () =
   let () = print_string "Enter a Guess: " in
   let user_guess = String.lowercase_ascii (read_line ()) in
-  if
-    check_word
-      (String.lowercase_ascii secret)
-      (user_guess)
-  then (
+  if check_word (String.lowercase_ascii secret) user_guess then (
     let colors = evaluate_colors user_guess secret in
     print_colored_guess user_guess colors 0;
     true)
@@ -78,6 +74,12 @@ let rec enter_guess secret () =
     print_endline "Invalid Guess, guess again!";
     enter_guess secret ())
 
+(**[format_grammar n] returns the correct form of the word "guess/guesses"
+   depending on [n] *)
+let format_grammar = function
+  | 1 -> "guess"
+  | _ -> "guesses"
+
 (**[play_game secret guess_num] runs the game loop with the secret word
    [secret]. The plaeyr has at most 6 guesses, which their current guess is kept
    track via [guess_num]. The game ends when the player either guesses the
@@ -88,11 +90,13 @@ let rec play_game secret guess_num =
   else
     let correct = enter_guess secret () in
     if correct then
-      Printf.printf "Correct! You won in %d guesses!\n" (guess_num + 1)
+      Printf.printf "Correct! You won in %d %s!\n" (guess_num + 1)
+        (format_grammar (guess_num + 1))
     else (
       (* TODO fix guesses/guess for singular *)
-      Printf.printf "Incorrect! You have %d guesses remaining!\n"
-        (6 - guess_num - 1);
+      Printf.printf "Incorrect! You have %d %s remaining!\n"
+        (6 - guess_num - 1)
+        (format_grammar (6 - guess_num - 1));
       play_game secret (guess_num + 1))
 
 (**Starts the game using [answer.secret_word] as the secret and [0] as the

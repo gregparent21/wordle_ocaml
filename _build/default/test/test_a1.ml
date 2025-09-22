@@ -11,7 +11,9 @@ let tests =
            in
            assert_bool "Checking secret is in dictionary"
              (List.mem s.secret_word expected_dictionary);
-           assert_equal expected_dictionary s.dictionary );
+           assert_bool
+             "Checking expected dictionary equals the correct dictionary"
+             (expected_dictionary = s.dictionary) );
          (*The following are tests regarding accepting/not accepting words *)
          ( "Word in Ta.txt is accepted as a guess" >:: fun _ ->
            let word = "ulans" in
@@ -62,7 +64,7 @@ let tests =
              "Checking evaluate_green is fully green when provided the secret"
              (evaluate_green guess secret 0 []
              = [ Green; Green; Green; Green; White ]) );
-           ( "Evaluate yellow letters correctly when there are no green"
+         ( "Evaluate yellow letters correctly when there are no green"
          >:: fun _ ->
            let secret = "house" in
            let guess = "match" in
@@ -70,13 +72,15 @@ let tests =
              "Checking yellow letters match correctly when there are no green"
              (evaluate_colors guess secret
              = [ White; White; White; White; Yellow ]) );
-             ( "Evaluate yellow letters correctly when there are some green"
+         ( "Evaluate yellow letters correctly when there is a duplicate \
+            character of a present letter"
          >:: fun _ ->
            let secret = "house" in
            let guess = "hatch" in
-           
+
            assert_bool
-             "Checking yellow letters match correctly when is a Green letter"
+             "Checking no yellow letters are present when there is a duplicate \
+              of a single Green letter"
              (evaluate_colors guess secret
              = [ Green; White; White; White; White ]) );
        ]
