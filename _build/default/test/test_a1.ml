@@ -83,6 +83,53 @@ let tests =
               of a single Green letter"
              (evaluate_colors guess secret
              = [ Green; White; White; White; White ]) );
+         ( "Evaluate only 1 letter is marked yellow when there is duplicates \
+            of said character in the secret "
+         >:: fun _ ->
+           let secret = "hands" in
+           let guess = "sassy" in
+
+           assert_bool
+             "Checking only 1 letter is marked yellow when there is duplicates \
+              of said character in the secret"
+             (evaluate_colors guess secret
+             = [ Yellow; Green; White; White; White ]) );
+         ( "Evaluate that a green letter will ensure a second same letter \
+            isn't marked yellow "
+         >:: fun _ ->
+           let secret = "apple" in
+           let guess = "papal" in
+
+           assert_bool
+             "Checking that a 2nd character of the same letter won't be marked \
+              yellow if there is only 1 instance of it in the secret (eg. two \
+              a's in papal, only marked marked for secret = 'apple' )"
+             (evaluate_colors guess secret
+             = [ Yellow; Yellow; Green; White; Yellow ]) );
+         ( "Evaluate all white when completely different set of letters "
+         >:: fun _ ->
+           let secret = "money" in
+           let guess = "stair" in
+
+           assert_bool "Checking all white when letters are entirely different"
+             (evaluate_colors guess secret
+             = [ White; White; White; White; White ]) );
+         ( "Evaluate [count_of_letter] [increment_count] and [decrement_count] \
+            methods "
+         >:: fun _ ->
+           let counts = [ ("A", 3); ("B", 2) ] in
+           assert_bool "Checking Correct count of A"
+             (count_of_letter "A" counts = 3);
+           let counts = increment_count "A" counts in
+           assert_bool "Checking correct incremented count of A"
+             (count_of_letter "A" counts = 4);
+           let counts = increment_count "C" counts in
+           assert_bool
+             "Checking correct incremented count of a new added letter"
+             (count_of_letter "C" counts = 1);
+           let counts = decrement_count "C" counts in
+           assert_bool "Checking correct decremented count of a letter to 0"
+             (count_of_letter "C" counts = 0) );
        ]
 
 let _ = run_test_tt_main tests

@@ -51,7 +51,6 @@ let rec print_colored_guess guess colors index =
   | [] -> print_newline ()
   | h :: t ->
       let character = String.uppercase_ascii (String.make 1 guess.[index]) in
-      (* TODO add genAi for String.make *)
       ANSITerminal.print_string (color_attributes h) character;
       print_colored_guess guess t (index + 1)
 
@@ -93,7 +92,6 @@ let rec play_game secret guess_num =
       Printf.printf "Correct! You won in %d %s!\n" (guess_num + 1)
         (format_grammar (guess_num + 1))
     else (
-      (* TODO fix guesses/guess for singular *)
       Printf.printf "Incorrect! You have %d %s remaining!\n"
         (6 - guess_num - 1)
         (format_grammar (6 - guess_num - 1));

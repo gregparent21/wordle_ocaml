@@ -75,10 +75,13 @@ let rec decrement_count c counts =
 (**[evaluate_green guess secret index acc] returns [acc], a list of type letter.
    It iterates through [guess] checking if the letter at position [index] is
    equal to the letter at said [index] in [secret]. It then prepends a Constant
-   of type letter to [acc]*)
+   of type letter to [acc]. Requires that [guess] and [secret] are the same
+   length*)
 
 let rec evaluate_green guess secret index acc =
-  if index = String.length guess then List.rev acc
+  if String.length guess != String.length secret then
+    failwith "Incompatible lengths"
+  else if index = String.length guess then List.rev acc
   else if guess.[index] = secret.[index] then
     evaluate_green guess secret (index + 1) (Green :: acc)
   else evaluate_green guess secret (index + 1) (White :: acc)
@@ -114,8 +117,12 @@ let rec find_yellow guess index colors counts acc =
 
 (**[evaluate_colors guess secret] is the full Wordle scoring for [guess] against
    [secret]. It first finds the [Green], meaning correct position letters, by
-   calling [evaluate_green], and then finds the [Yellow] letters.*)
+   calling [evaluate_green], and then finds the [Yellow] letters. Requires the
+   lengths of [guess] and [secret] are equal*)
 let evaluate_colors guess secret =
-  let colors = evaluate_green guess secret 0 [] in
-  let counts = find_count secret 0 colors [] in
-  find_yellow guess 0 colors counts []
+  if String.length guess != String.length secret then
+    failwith "Incompatible string lengths"
+  else
+    let colors = evaluate_green guess secret 0 [] in
+    let counts = find_count secret 0 colors [] in
+    find_yellow guess 0 colors counts []

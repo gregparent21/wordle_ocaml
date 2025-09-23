@@ -51,7 +51,6 @@ let rec print_colored_guess guess colors index =
   | [] -> print_newline ()
   | h :: t ->
       let character = String.uppercase_ascii (String.make 1 guess.[index]) in
-      (* TODO add genAi for String.make *)
       ANSITerminal.print_string (color_attributes h) character;
       print_colored_guess guess t (index + 1)
 
